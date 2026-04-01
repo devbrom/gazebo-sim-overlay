@@ -30,6 +30,9 @@
   qtdeclarative,
   qtgraphicaleffects,
   qtquickcontrols,
+  # Darwin-specific
+  darwin ? null,
+  OpenGL ? null,
   ignition,
   ignition-cmake ? ignition.cmake,
   ignition-common ? ignition.common,
@@ -78,8 +81,6 @@ stdenv.mkDerivation rec {
 
   propagatedBuildInputs = [
     freeimage
-    freeglut
-    libGL
     openal
     hdf5
     curl
@@ -114,6 +115,13 @@ stdenv.mkDerivation rec {
     ignition-physics
     ignition-tools
     sdformat
+  ]
+  ++ lib.optionals stdenv.isLinux [
+    freeglut
+    libGL
+  ]
+  ++ lib.optionals stdenv.isDarwin [
+    OpenGL
   ]
   ++ lib.optional withBulletEngineSupport bullet;
   patches =

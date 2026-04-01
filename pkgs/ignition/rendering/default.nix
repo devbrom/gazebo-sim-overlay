@@ -20,6 +20,9 @@
   libGLU,
   xorg,
   boost,
+  # Darwin-specific
+  darwin ? null,
+  OpenGL ? null,
   ...
 }:
 stdenv.mkDerivation rec {
@@ -54,10 +57,15 @@ stdenv.mkDerivation rec {
     ogre
     eigen
     freeimage
-    libGL
-    xorg.libX11
     boost
+  ]
+  ++ lib.optionals stdenv.isLinux [
+    libGL
     libGLU
+    xorg.libX11
+  ]
+  ++ lib.optionals stdenv.isDarwin [
+    OpenGL
   ];
   cmakeFlags = [
     "-DCMAKE_INSTALL_LIBDIR='lib'"

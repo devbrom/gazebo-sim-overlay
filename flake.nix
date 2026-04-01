@@ -3,8 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixgl.url = "github:guibou/nixGL";
-    systems.url = "github:nix-systems/default-linux";
+    systems.url = "github:nix-systems/default";
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
   outputs =
@@ -12,7 +11,6 @@
       self,
       nixpkgs,
       systems,
-      nixgl,
       treefmt-nix,
       ...
     }@inputs:
@@ -35,7 +33,6 @@
           overlays = [
             # self.overlays.modifications
             self.overlays.default
-            nixgl.overlays.default
           ];
         }
       );

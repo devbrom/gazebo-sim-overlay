@@ -26,6 +26,13 @@
   withNvidiaCg ? false,
   nvidia_cg_toolkit,
   withSamples ? false,
+  # Darwin-specific
+  darwin ? null,
+  ApplicationServices ? null,
+  Cocoa ? null,
+  Foundation ? null,
+  IOKit ? null,
+  OpenGL ? null,
 }:
 stdenv.mkDerivation rec {
   pname = "ogre";
@@ -66,25 +73,34 @@ stdenv.mkDerivation rec {
   ];
 
   buildInputs = [
-    libGLU
-    libGL
     freetype
     freeimage
     zziplib
+    libpng
+    boost
+    ois
+  ]
+  ++ lib.optionals stdenv.isLinux [
+    libGLU
+    libGL
     xorgproto
     libXrandr
     libXaw
     freeglut
     libXt
-    libpng
-    boost
-    ois
     libX11
     libXmu
     libSM
     libXxf86vm
     libICE
     libXrender
+  ]
+  ++ lib.optionals stdenv.isDarwin [
+    ApplicationServices
+    Cocoa
+    Foundation
+    IOKit
+    OpenGL
   ]
   ++ lib.optionals withNvidiaCg [
     nvidia_cg_toolkit
@@ -94,7 +110,7 @@ stdenv.mkDerivation rec {
     description = "3D Object-Oriented Graphics Rendering Engine";
     homepage = "https://www.ogre3d.org/";
     maintainers = with maintainers; [ lopsided98 ];
-    platforms = platforms.linux;
+    platforms = platforms.unix;
     license = licenses.mit;
   };
 }

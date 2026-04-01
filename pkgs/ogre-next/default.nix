@@ -11,7 +11,6 @@
   ninja,
   tinyxml,
   rapidjson,
-  openvr,
   cppunit,
   vulkan-headers,
   shaderc,
@@ -21,6 +20,17 @@
   graphviz,
   zlib,
   libXrandr,
+  # Optional dependencies
+  withOpenVR ? false,
+  openvr,
+  # Darwin-specific
+  darwin ? null,
+  ApplicationServices ? null,
+  Cocoa ? null,
+  Foundation ? null,
+  IOKit ? null,
+  Metal ? null,
+  OpenGL ? null,
 }:
 stdenv.mkDerivation rec {
   pname = "ogre-next";
@@ -52,25 +62,37 @@ stdenv.mkDerivation rec {
     cmake
     doxygen
     graphviz
-    mesa
     ninja
     cppunit
     vulkan-headers
     shaderc
+  ]
+  ++ lib.optionals stdenv.isLinux [
+    mesa
   ];
 
   buildInputs = [
     freeimage
     freetype
-    libXaw
-    libXrandr
     rapidjson
     zziplib
     SDL2
-    libGLU
     tinyxml
     zlib
-    openvr
+  ]
+  ++ lib.optional withOpenVR openvr
+  ++ lib.optionals stdenv.isLinux [
+    libXaw
+    libXrandr
+    libGLU
+  ]
+  ++ lib.optionals stdenv.isDarwin [
+    ApplicationServices
+    Cocoa
+    Foundation
+    IOKit
+    Metal
+    OpenGL
   ];
 
   meta = with lib; {
@@ -78,7 +100,7 @@ stdenv.mkDerivation rec {
     aka ogre v2 - scene-oriented, flexible 3D C++ engine ";
     homepage = "https://ogrecave.github.io/ogre-next/api/latest";
     maintainers = with maintainers; [ muellerbernd ];
-    platforms = platforms.linux;
+    platforms = platforms.unix;
     license = licenses.mit;
   };
 }
