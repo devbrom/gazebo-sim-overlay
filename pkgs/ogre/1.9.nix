@@ -65,7 +65,13 @@ stdenv.mkDerivation rec {
     ]
     ++ lib.optional withNvidiaCg "CG"
   )
-  ++ map (x: "-DOGRE_BUILD_RENDERSYSTEM_${x}=on") [ "GL" ];
+  ++ map (x: "-DOGRE_BUILD_RENDERSYSTEM_${x}=on") [ "GL" ]
+  ++ lib.optionals stdenv.isDarwin [
+    # Work around Boost 1.87+ CMake detection issues on macOS
+    "-DBoost_NO_BOOST_CMAKE=ON"
+    "-DBOOST_ROOT=${boost.dev}"
+    "-DBoost_NO_SYSTEM_PATHS=ON"
+  ];
 
   nativeBuildInputs = [
     cmake
