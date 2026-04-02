@@ -1,5 +1,5 @@
 diff --git a/Components/RTShaderSystem/src/OgreShaderGLSLESProgramWriter.cpp b/Components/RTShaderSystem/src/OgreShaderGLSLESProgramWriter.cpp
-index 218c73add..2be133352 100644
+index 218c73add..7a40e0e83 100644
 --- a/Components/RTShaderSystem/src/OgreShaderGLSLESProgramWriter.cpp
 +++ b/Components/RTShaderSystem/src/OgreShaderGLSLESProgramWriter.cpp
 @@ -42,7 +42,7 @@ namespace Ogre {
@@ -11,8 +11,17 @@ index 218c73add..2be133352 100644
          {
              bool operator()( const UniformParameterPtr& uniform, const String& name ) const 
              {
+@@ -436,7 +436,7 @@ namespace Ogre {
+                             // If its not a varying param check if a uniform is written
+                             if(!isVarying)
+                             {
+-                                UniformParameterList::const_iterator itFound = std::find_if( parameterList.begin(), parameterList.end(), std::bind2nd( CompareUniformByNameES(), paramName ) );
++                                UniformParameterList::const_iterator itFound = std::find_if( parameterList.begin(), parameterList.end(), [&paramName](const UniformParameterPtr& uniform) { return uniform->getName() == paramName; } );
+                                 if(itFound != parameterList.end())
+                                 {	
+                                     // Declare the copy variable
 diff --git a/Components/RTShaderSystem/src/OgreShaderGLSLProgramWriter.cpp b/Components/RTShaderSystem/src/OgreShaderGLSLProgramWriter.cpp
-index 619e6bd2d..f79c93d48 100644
+index 619e6bd2d..1c16a1e93 100644
 --- a/Components/RTShaderSystem/src/OgreShaderGLSLProgramWriter.cpp
 +++ b/Components/RTShaderSystem/src/OgreShaderGLSLProgramWriter.cpp
 @@ -36,7 +36,7 @@ namespace RTShader {
@@ -24,6 +33,15 @@ index 619e6bd2d..f79c93d48 100644
  {
  	bool operator()( const UniformParameterPtr& uniform, const String& name ) const 
  	{
+@@ -254,7 +254,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
+ 					// If its not a varying param check if a uniform is written
+ 					if(!isVarying)
+ 					{
+-						UniformParameterList::const_iterator itFound = std::find_if( parameterList.begin(), parameterList.end(), std::bind2nd( CompareUniformByName(), paramName ) );
++						UniformParameterList::const_iterator itFound = std::find_if( parameterList.begin(), parameterList.end(), [&paramName](const UniformParameterPtr& uniform) { return uniform->getName() == paramName; } );
+ 						if(itFound != parameterList.end())
+ 						{	
+ 							// Declare the copy variable
 diff --git a/OgreMain/src/OgreLodStrategy.cpp b/OgreMain/src/OgreLodStrategy.cpp
 index df12e8ac3..a10ba42ae 100644
 --- a/OgreMain/src/OgreLodStrategy.cpp

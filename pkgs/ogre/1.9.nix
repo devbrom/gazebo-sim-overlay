@@ -47,12 +47,13 @@ stdenv.mkDerivation rec {
 
   # Patches for Darwin compatibility
   patches = lib.optionals stdenv.isDarwin [
-    ./fix-binary-function.patch   # Fix for C++17 compatibility
-    ./fix-auto-ptr.patch          # Fix for C++17 compatibility
-    ./fix-sse-darwin.patch        # Fix SSE detection and usage on ARM macOS
-    ./fix-utf-string-libcxx.patch # libc++ compatibility (macOS/BSD)
-    ./fix-atomic-darwin.patch     # Remove -latomic on macOS (not needed)
-    ./fix-ditto-darwin.patch      # Replace ditto with cp
+    ./fix-binary-function.patch      # Fix for C++17 compatibility
+    ./fix-auto-ptr.patch             # Fix for C++17 compatibility
+    ./fix-sse-darwin.patch           # Fix SSE detection and usage on ARM macOS
+    ./fix-utf-string-libcxx.patch    # libc++ compatibility (macOS/BSD)
+    ./fix-atomic-darwin.patch        # Remove -latomic on macOS (not needed)
+    ./fix-ditto-darwin.patch         # Replace ditto with cp
+    ./fix-render-system-darwin.patch # Exclude Carbon/AGL files on ARM64 as they are not available
   ];
 
   cmakeFlags = [

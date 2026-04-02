@@ -3,14 +3,12 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    systems.url = "github:nix-systems/default";
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
   outputs =
     {
       self,
       nixpkgs,
-      systems,
       treefmt-nix,
       ...
     }@inputs:
@@ -18,8 +16,14 @@
       inherit (self) outputs;
 
       lib = nixpkgs.lib;
-      forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
-      pkgsFor = lib.genAttrs (import systems) (
+      allSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      forEachSystem = f: lib.genAttrs allSystems (system: f pkgsFor.${system});
+      pkgsFor = lib.genAttrs allSystems (
         system:
         import nixpkgs {
           inherit system;
