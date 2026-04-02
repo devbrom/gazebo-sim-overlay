@@ -1,3 +1,29 @@
+diff --git a/Components/RTShaderSystem/src/OgreShaderGLSLESProgramWriter.cpp b/Components/RTShaderSystem/src/OgreShaderGLSLESProgramWriter.cpp
+index 218c73add..2be133352 100644
+--- a/Components/RTShaderSystem/src/OgreShaderGLSLESProgramWriter.cpp
++++ b/Components/RTShaderSystem/src/OgreShaderGLSLESProgramWriter.cpp
+@@ -42,7 +42,7 @@ namespace Ogre {
+         String GLSLESProgramWriter::TargetLanguage =  "glsles";
+ 
+         // Uniform comparer
+-        struct CompareUniformByNameES : std::binary_function<UniformParameterPtr, String, bool>
++        struct CompareUniformByNameES
+         {
+             bool operator()( const UniformParameterPtr& uniform, const String& name ) const 
+             {
+diff --git a/Components/RTShaderSystem/src/OgreShaderGLSLProgramWriter.cpp b/Components/RTShaderSystem/src/OgreShaderGLSLProgramWriter.cpp
+index 619e6bd2d..f79c93d48 100644
+--- a/Components/RTShaderSystem/src/OgreShaderGLSLProgramWriter.cpp
++++ b/Components/RTShaderSystem/src/OgreShaderGLSLProgramWriter.cpp
+@@ -36,7 +36,7 @@ namespace RTShader {
+ String GLSLProgramWriter::TargetLanguage = "glsl";
+ 
+ // Uniform comparer
+-struct CompareUniformByName : std::binary_function<UniformParameterPtr, String, bool>
++struct CompareUniformByName
+ {
+ 	bool operator()( const UniformParameterPtr& uniform, const String& name ) const 
+ 	{
 diff --git a/OgreMain/src/OgreLodStrategy.cpp b/OgreMain/src/OgreLodStrategy.cpp
 index df12e8ac3..a10ba42ae 100644
 --- a/OgreMain/src/OgreLodStrategy.cpp
@@ -22,3 +48,25 @@ index df12e8ac3..a10ba42ae 100644
      {
          bool operator() (const MeshLodUsage& mesh1, const MeshLodUsage& mesh2)
          {
+diff --git a/OgreMain/src/OgreZip.cpp b/OgreMain/src/OgreZip.cpp
+index 7bfe8eee4..8191e113a 100644
+--- a/OgreMain/src/OgreZip.cpp
++++ b/OgreMain/src/OgreZip.cpp
+@@ -260,7 +260,7 @@ namespace Ogre {
+         return ret;
+     }
+     //-----------------------------------------------------------------------
+-	struct FileNameCompare : public std::binary_function<FileInfo, String, bool>
++	struct FileNameCompare
+ 	{
+ 		bool operator()(const Ogre::FileInfo& lhs, const String& filename) const
+ 		{
+@@ -278,7 +278,7 @@ namespace Ogre {
+ 			cleanName = tokens[tokens.size() - 1];
+ 		}
+ 
+-		return std::find_if (mFileList.begin(), mFileList.end(), std::bind2nd<FileNameCompare>(FileNameCompare(), cleanName)) != mFileList.end();
++		return std::find_if (mFileList.begin(), mFileList.end(), [&cleanName](const FileInfo& info) { return info.filename == cleanName; }) != mFileList.end();
+ 	}
+ 	//---------------------------------------------------------------------
+ 	time_t ZipArchive::getModifiedTime(const String& filename)

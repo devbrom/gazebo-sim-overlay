@@ -1,0 +1,20 @@
+diff --git a/OgreMain/include/OgrePlatform.h b/OgreMain/include/OgrePlatform.h
+index 6754c4e794..fc6ad6eef6 100644
+--- a/OgreMain/include/OgrePlatform.h
++++ b/OgreMain/include/OgrePlatform.h
+@@ -323,9 +323,14 @@ THE SOFTWARE.
+     #define OGRE_PLATFORM_LIB "libOgrePlatform.so"
+ #endif
+ 
++#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
++// XCode 16.3 fails to compile our UTFString due undefined std::char_traits<ushort>
++#    define OGRE_UNICODE_SUPPORT 0
++#else
+ // Always enable unicode support for the moment
+ // Perhaps disable in old versions of gcc if necessary
+-#define OGRE_UNICODE_SUPPORT 1
++#    define OGRE_UNICODE_SUPPORT 1
++#endif
+ 
+ #endif
+ 

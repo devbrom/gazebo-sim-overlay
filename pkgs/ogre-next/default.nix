@@ -43,6 +43,12 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-elSj35LwsLzj1ssDPsk9NW/KSXfiOGYmw9hQSAWdpFM=";
   };
 
+  # Patches for Darwin compatibility
+  patches = lib.optionals stdenv.isDarwin [
+    ./fix-char-traits.patch  # Fix char_traits for unsigned short/int on modern libc++
+    ./fix-ditto-darwin.patch # Replace ditto with cp 
+  ];
+
   cmakeFlags = [
     "-DCMAKE_BUILD_TYPE=Release"
     "-DOGRE_USE_NEW_PROJECT_NAME=ON"
@@ -109,3 +115,4 @@ stdenv.mkDerivation rec {
     license = licenses.mit;
   };
 }
+

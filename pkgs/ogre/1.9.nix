@@ -51,6 +51,8 @@ stdenv.mkDerivation rec {
     ./fix-auto-ptr.patch          # Fix for C++17 compatibility
     ./fix-sse-darwin.patch        # Fix SSE detection and usage on ARM macOS
     ./fix-utf-string-libcxx.patch # libc++ compatibility (macOS/BSD)
+    ./fix-atomic-darwin.patch     # Remove -latomic on macOS (not needed)
+    ./fix-ditto-darwin.patch      # Replace ditto with cp
   ];
 
   cmakeFlags = [
@@ -124,3 +126,4 @@ stdenv.mkDerivation rec {
     license = licenses.mit;
   };
 }
+
