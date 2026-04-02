@@ -1,0 +1,27 @@
+diff --git a/OgreMain/src/OgreProgressiveMeshGenerator.cpp b/OgreMain/src/OgreProgressiveMeshGenerator.cpp
+index 9cb0818a1..e4ad1a3a7 100644
+--- a/OgreMain/src/OgreProgressiveMeshGenerator.cpp
++++ b/OgreMain/src/OgreProgressiveMeshGenerator.cpp
+@@ -951,7 +951,7 @@ void ProgressiveMeshGenerator::bakeLods()
+ {
+ 
+ 	unsigned short submeshCount = mMesh->getNumSubMeshes();
+-	std::auto_ptr<IndexBufferPointer> indexBuffer(new IndexBufferPointer[submeshCount]);
++	std::unique_ptr<IndexBufferPointer[]> indexBuffer(new IndexBufferPointer[submeshCount]);
+ 
+ 	// Create buffers.
+ 	for (unsigned short i = 0; i < submeshCount; i++) {
+diff --git a/OgreMain/src/OgreQueuedProgressiveMeshGenerator.cpp b/OgreMain/src/OgreQueuedProgressiveMeshGenerator.cpp
+index 915fd1450..b217b7321 100644
+--- a/OgreMain/src/OgreQueuedProgressiveMeshGenerator.cpp
++++ b/OgreMain/src/OgreQueuedProgressiveMeshGenerator.cpp
+@@ -241,7 +241,7 @@ void PMWorker::bakeLods()
+ {
+ 
+ 	unsigned short submeshCount = mRequest->submesh.size();
+-	std::auto_ptr<IndexBufferPointer> indexBuffer(new IndexBufferPointer[submeshCount]);
++	std::unique_ptr<IndexBufferPointer[]> indexBuffer(new IndexBufferPointer[submeshCount]);
+ 
+ 	// Create buffers.
+ 	for (unsigned short i = 0; i < submeshCount; i++) {
+

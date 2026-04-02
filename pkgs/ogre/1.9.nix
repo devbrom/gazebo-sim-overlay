@@ -45,13 +45,13 @@ stdenv.mkDerivation rec {
     sha256 = "11lfgzqaps3728dswrq3cbwk7aicigyz08q4hfyy6ikc6m35r4wg";
   };
 
-  # fix for ARM. sys/sysctl.h has moved in later glibcs, and
-  # https://github.com/OGRECave/ogre-next/issues/132 suggests it isn't
-  # needed anyway.
-  postPatch = ''
-    substituteInPlace OgreMain/src/OgrePlatformInformation.cpp \
-      --replace '#include <sys/sysctl.h>' ""
-  '';
+  # Patches for Darwin compatibility
+  patches = lib.optionals stdenv.isDarwin [
+    ./fix-binary-function.patch   # Fix for C++17 compatibility
+    ./fix-auto-ptr.patch          # Fix for C++17 compatibility
+    ./fix-sse-darwin.patch        # Fix SSE detection and usage on ARM macOS
+    ./fix-utf-string-libcxx.patch # libc++ compatibility (macOS/BSD)
+  ];
 
   cmakeFlags = [
     "-DOGRE_BUILD_SAMPLES=${toString withSamples}"
@@ -71,6 +71,10 @@ stdenv.mkDerivation rec {
     "-DBoost_NO_BOOST_CMAKE=ON"
     "-DBOOST_ROOT=${boost.dev}"
     "-DBoost_NO_SYSTEM_PATHS=ON"
+  ]
+  ++ lib.optionals (stdenv.isDarwin && stdenv.isAarch64) [
+    # Disable SSE/x86 intrinsics on ARM macOS
+    "-DOGRE_CONFIG_ENABLE_SSE=OFF"
   ];
 
   nativeBuildInputs = [

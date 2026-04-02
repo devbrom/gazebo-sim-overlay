@@ -1,0 +1,69 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 073a48d5d..47c08ff15 100755
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -95,9 +95,12 @@ endif ()
+ 
+ # Set compiler specific build flags
+ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
+-  check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
+-  if (OGRE_GCC_HAS_SSE)
+-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
++  # Only enable SSE on x86/x64 platforms
++  if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)|(x86_64)|(X86_64)")
++    check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
++    if (OGRE_GCC_HAS_SSE)
++      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
++    endif ()
+   endif ()
+   # This is a set of sensible warnings that provide meaningful output
+   set(OGRE_WARNING_FLAGS "-Wall -Winit-self -Wno-overloaded-virtual -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter -Wshadow -Wno-missing-field-initializers -Wno-long-long")
+@@ -327,6 +330,11 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+   # 10.7 is the minimum for libc++ support
+   set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
+ 
++  # Remove SSE flags on macOS ARM (Apple Silicon)
++  if (CMAKE_SYSTEM_PROCESSOR MATCHES "arm64" OR CMAKE_OSX_ARCHITECTURES MATCHES "arm64")
++    string (REPLACE "-msse" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
++  endif ()
++
+   # Make sure that the OpenGL render system is selected for non-iOS Apple builds
+   set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
+   set(OGRE_BUILD_RENDERSYSTEM_GLES2 FALSE)
+diff --git a/OgreMain/CMakeLists.txt b/OgreMain/CMakeLists.txt
+index 34960fda2..051f324d0 100644
+--- a/OgreMain/CMakeLists.txt
++++ b/OgreMain/CMakeLists.txt
+@@ -43,6 +43,11 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
+     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp"
+ )
+ 
++# Remove SSE-specific optimized utilities on non-x86 platforms
++if (NOT CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)|(i.86)|(x86_64)|(X86_64)")
++    list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreOptimisedUtilSSE.cpp")
++endif()
++
+ # Add platform specific files
+ if (OGRE_BUILD_PLATFORM_NACL)
+   include_directories("include/NaCl")
+diff --git a/OgreMain/include/OgrePlatformInformation.h b/OgreMain/include/OgrePlatformInformation.h
+index 99480328d..dfcdbd30d 100644
+--- a/OgreMain/include/OgrePlatformInformation.h
++++ b/OgreMain/include/OgrePlatformInformation.h
+@@ -49,14 +49,10 @@ namespace Ogre {
+     (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
+ #   define OGRE_CPU OGRE_CPU_X86
+ 
+-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__BIG_ENDIAN__)
+-#   define OGRE_CPU OGRE_CPU_PPC
+-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+-#	define OGRE_CPU OGRE_CPU_X86
+-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && (defined(__i386__) || defined(__x86_64__))
+-#	define OGRE_CPU OGRE_CPU_X86
+ #elif defined(__arm__) || defined(_M_ARM) || defined(__arm64__) || defined(__aarch64__)
+ #	define OGRE_CPU OGRE_CPU_ARM
++#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__BIG_ENDIAN__)
++#   define OGRE_CPU OGRE_CPU_PPC
+ #elif defined(__mips64) || defined(__mips64_)
+ #	define OGRE_CPU OGRE_CPU_MIPS
+ #else

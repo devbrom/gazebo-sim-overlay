@@ -58,17 +58,22 @@ stdenv.mkDerivation rec {
     "-DOGRE_INSTALL_SAMPLES_SOURCE=ON"
   ];
 
+  # Use Unix Makefiles instead of Ninja on macOS to avoid build file generation issues
+  preConfigure = lib.optionalString stdenv.isDarwin ''
+    cmakeFlagsArray+=("-G" "Unix Makefiles")
+  '';
+
   nativeBuildInputs = [
     cmake
     doxygen
     graphviz
-    ninja
     cppunit
     vulkan-headers
     shaderc
   ]
   ++ lib.optionals stdenv.isLinux [
     mesa
+    ninja
   ];
 
   buildInputs = [
