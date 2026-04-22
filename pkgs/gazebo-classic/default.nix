@@ -27,6 +27,9 @@
   tbb,
   ogre1_9,
   ffmpeg_5,
+  # Darwin-specific
+  darwin ? null,
+  OpenGL ? null,
   ignition,
   ignition-cmake ? ignition.cmake2,
   ignition-common ? ignition.common3,
@@ -68,7 +71,6 @@ mkDerivation rec {
   ];
 
   buildInputs = [
-    libGL
     openal
     hdf5
     curl
@@ -85,6 +87,12 @@ mkDerivation rec {
     ignition-common
     ignition-msgs
     libsForQt5.qwt
+  ]
+  ++ lib.optionals lib.stdenv.isLinux [
+    libGL
+  ]
+  ++ lib.optionals lib.stdenv.isDarwin [
+    OpenGL
   ]
   ++ lib.optional withBulletEngineSupport bullet;
 

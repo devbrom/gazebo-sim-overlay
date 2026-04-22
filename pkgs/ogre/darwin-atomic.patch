@@ -1,0 +1,16 @@
+diff --git a/OgreMain/CMakeLists.txt b/OgreMain/CMakeLists.txt
+index 051f324d0..22072289a 100644
+--- a/OgreMain/CMakeLists.txt
++++ b/OgreMain/CMakeLists.txt
+@@ -296,7 +296,10 @@ else()
+ endif()
+ 
+ if(OGRE_GCC_VERSION VERSION_EQUAL 4.8 OR OGRE_GCC_VERSION VERSION_GREATER 4.8)
+-  list(APPEND LIBRARIES "-latomic")
++  # libatomic is only needed on Linux with GCC; macOS has built-in atomic support
++  if(NOT APPLE)
++    list(APPEND LIBRARIES "-latomic")
++  endif()
+ endif()
+ 
+ if (APPLE)

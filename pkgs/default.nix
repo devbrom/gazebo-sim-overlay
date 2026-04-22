@@ -7,9 +7,9 @@ rec {
   # gazebo_sim = pkgs.callPackage ./gazebo-sim {};
   gazebo = gazebo_classic;
   gazebo_11 = gazebo_classic;
-  gz-harmonic = pkgs.callPackage ./gazebo-sim/8.nix { };
-  gz-ionic = pkgs.callPackage ./gazebo-sim/9.nix { };
-  ignition-fortress = pkgs.callPackage ./gazebo-sim/6.nix { };
+  gz-harmonic = pkgs.libsForQt5.callPackage ./gazebo-sim/8.nix { };
+  gz-ionic = pkgs.libsForQt5.callPackage ./gazebo-sim/9.nix { };
+  ignition-fortress = pkgs.libsForQt5.callPackage ./gazebo-sim/6.nix { };
 
   libdart = pkgs.callPackage ./libdart { };
 

@@ -33,10 +33,6 @@ stdenv.mkDerivation rec {
 
   # Don't require Protobuf 3
   patches = lib.optional (majorVersion == "10") [
-    # (fetchpatch {
-    #   url = "https://github.com/gazebosim/gz-msgs/commit/0c0926c37042ac8f5aeb49ac36101acd3e084c6b.patch";
-    #   hash = "sha256-QnR1WtB4gbgyJKbQ4doMhfSjJBksEeQ3Us4y9KqCWeY=";
-    # })
     ./CMake.patch
     (fetchpatch {
       url = "https://github.com/gazebosim/gz-msgs/commit/ebdd05f6d51c990876085bcc9db9f79df59d375a.patch";
@@ -64,18 +60,6 @@ stdenv.mkDerivation rec {
   ];
 
   buildInputs = [ cmake ];
-
-  # postInstall = ''
-  #   mkdir ~/.gz/tools/configs -p
-  #   cd ~/.gz/tools/configs/
-  #   ln -s $out/share/gz/*.yaml .
-  # '';
-  # postInstall = ''
-  #   export GZ_CONFIG_PATH=$out/share/gz:$GZ_CONFIG_PATH
-  # '';
-  # cmakeFlags = [
-  #   "-DCMAKE_INSTALL_LIBDIR='lib'"
-  # ];
 
   meta = with lib; {
     homepage = "https://ignitionrobotics.org/libs/msgs";

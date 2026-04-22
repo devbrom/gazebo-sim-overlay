@@ -6,8 +6,8 @@
 callPackage ./. (
   {
     majorVersion = "9";
-    version = "9.1.0";
-    srcHash = "sha256-dMqJqp5229r/mKjBzUJD/tEbsYZANAFNycHYc7CIkz8=";
+    version = "9.2.0";
+    srcHash = "sha256-Vxl3xdmh8ybRbjDxNGt8qgQOP9ctAcYAoVwWeytAglc=";
     ignition-plugin = ignition.plugin3;
     ignition-transport = ignition.transport14;
     ignition-rendering = ignition.rendering9;

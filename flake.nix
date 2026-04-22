@@ -4,14 +4,12 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nixgl.url = "github:guibou/nixGL";
-    systems.url = "github:nix-systems/default-linux";
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
   outputs =
     {
       self,
       nixpkgs,
-      systems,
       nixgl,
       treefmt-nix,
       ...
@@ -20,8 +18,14 @@
       inherit (self) outputs;
 
       lib = nixpkgs.lib;
-      forEachSystem = f: lib.genAttrs (import systems) (system: f pkgsFor.${system});
-      pkgsFor = lib.genAttrs (import systems) (
+      allSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      forEachSystem = f: lib.genAttrs allSystems (system: f pkgsFor.${system});
+      pkgsFor = lib.genAttrs allSystems (
         system:
         import nixpkgs {
           inherit system;
@@ -33,8 +37,9 @@
           ];
 
           overlays = [
-            # self.overlays.modifications
             self.overlays.default
+          ]
+          ++ lib.optionals (system == "x86_64-linux") [
             nixgl.overlays.default
           ];
         }

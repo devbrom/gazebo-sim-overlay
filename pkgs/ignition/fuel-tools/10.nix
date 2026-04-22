@@ -5,8 +5,8 @@
 callPackage ./. (
   {
     majorVersion = "10";
-    version = "10.0.1";
-    srcHash = "sha256-/Xfhec6kpv6srSp+hudqBaK4dKFn0QK45aGqxzNyytw=";
+    version = "10.1.0";
+    srcHash = "sha256-ONo0zmKHSu1i6GAouDzFD5T2PUNXJ4IjhgPSoORRzao=";
     ignition-common = ignition.common6;
     ignition-msgs = ignition.msgs11;
     ignition-cmake = ignition.cmake4;

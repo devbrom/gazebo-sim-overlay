@@ -26,6 +26,13 @@
   withNvidiaCg ? false,
   nvidia_cg_toolkit,
   withSamples ? false,
+  # Darwin-specific
+  darwin ? null,
+  ApplicationServices ? null,
+  Cocoa ? null,
+  Foundation ? null,
+  IOKit ? null,
+  OpenGL ? null,
 }:
 stdenv.mkDerivation rec {
   pname = "ogre";
@@ -38,13 +45,16 @@ stdenv.mkDerivation rec {
     sha256 = "11lfgzqaps3728dswrq3cbwk7aicigyz08q4hfyy6ikc6m35r4wg";
   };
 
-  # fix for ARM. sys/sysctl.h has moved in later glibcs, and
-  # https://github.com/OGRECave/ogre-next/issues/132 suggests it isn't
-  # needed anyway.
-  postPatch = ''
-    substituteInPlace OgreMain/src/OgrePlatformInformation.cpp \
-      --replace '#include <sys/sysctl.h>' ""
-  '';
+  # Patches for Darwin compatibility
+  patches = lib.optionals stdenv.isDarwin [
+    ./darwin-binary-function.patch # Fix for C++17 compatibility
+    ./darwin-auto-ptr.patch # Fix for C++17 compatibility
+    ./darwin-sse.patch # Fix SSE detection and usage on ARM macOS
+    ./darwin-utf-string-libcxx.patch # libc++ compatibility (macOS/BSD)
+    ./darwin-atomic.patch # Remove -latomic on macOS (not needed)
+    ./darwin-replace-ditto-with-cp.patch # Replace ditto with cp
+    ./darwin-render-system.patch # Exclude Carbon/AGL files on ARM64 as they are not available
+  ];
 
   cmakeFlags = [
     "-DOGRE_BUILD_SAMPLES=${toString withSamples}"
@@ -58,7 +68,17 @@ stdenv.mkDerivation rec {
     ]
     ++ lib.optional withNvidiaCg "CG"
   )
-  ++ map (x: "-DOGRE_BUILD_RENDERSYSTEM_${x}=on") [ "GL" ];
+  ++ map (x: "-DOGRE_BUILD_RENDERSYSTEM_${x}=on") [ "GL" ]
+  ++ lib.optionals stdenv.isDarwin [
+    # Work around Boost 1.87+ CMake detection issues on macOS
+    "-DBoost_NO_BOOST_CMAKE=ON"
+    "-DBOOST_ROOT=${boost.dev}"
+    "-DBoost_NO_SYSTEM_PATHS=ON"
+  ]
+  ++ lib.optionals (stdenv.isDarwin && stdenv.isAarch64) [
+    # Disable SSE/x86 intrinsics on ARM macOS
+    "-DOGRE_CONFIG_ENABLE_SSE=OFF"
+  ];
 
   nativeBuildInputs = [
     cmake
@@ -66,25 +86,34 @@ stdenv.mkDerivation rec {
   ];
 
   buildInputs = [
-    libGLU
-    libGL
     freetype
     freeimage
     zziplib
+    libpng
+    boost
+    ois
+  ]
+  ++ lib.optionals stdenv.isLinux [
+    libGLU
+    libGL
     xorgproto
     libXrandr
     libXaw
     freeglut
     libXt
-    libpng
-    boost
-    ois
     libX11
     libXmu
     libSM
     libXxf86vm
     libICE
     libXrender
+  ]
+  ++ lib.optionals stdenv.isDarwin [
+    ApplicationServices
+    Cocoa
+    Foundation
+    IOKit
+    OpenGL
   ]
   ++ lib.optionals withNvidiaCg [
     nvidia_cg_toolkit
@@ -94,7 +123,7 @@ stdenv.mkDerivation rec {
     description = "3D Object-Oriented Graphics Rendering Engine";
     homepage = "https://www.ogre3d.org/";
     maintainers = with maintainers; [ lopsided98 ];
-    platforms = platforms.linux;
+    platforms = platforms.unix;
     license = licenses.mit;
   };
 }

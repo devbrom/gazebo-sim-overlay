@@ -25,6 +25,10 @@
   openscenegraph,
   blas,
   boost,
+  # Darwin-specific
+  darwin ? null,
+  Cocoa ? null,
+  OpenGL ? null,
 }:
 stdenv.mkDerivation rec {
   pname = "libdart";
@@ -48,7 +52,6 @@ stdenv.mkDerivation rec {
     eigen
     fmt
     assimp
-    libGLU
     ipopt
     nlopt
     libccd
@@ -61,10 +64,17 @@ stdenv.mkDerivation rec {
     lapack
     urdfdom
     urdfdom-headers
-    freeglut
     openscenegraph
     blas
     boost
+  ]
+  ++ lib.optionals stdenv.isLinux [
+    libGLU
+    freeglut
+  ]
+  ++ lib.optionals stdenv.isDarwin [
+    Cocoa
+    OpenGL
   ];
 
   # postPatchPhase = ''

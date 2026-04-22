@@ -19,6 +19,12 @@
   ignition-sim ? ignition.sim,
   sdformat ? ignition.sdformat,
   makeWrapper,
+  qtbase,
+  qtdeclarative,
+  qtquickcontrols,
+  qtquickcontrols2,
+  qtgraphicaleffects,
+  wrapQtAppsHook,
   majorVersion ? "8",
   ...
 }:
@@ -42,9 +48,36 @@ symlinkJoin {
     ignition-sim
   ];
   buildInputs = [ makeWrapper ];
+  nativeBuildInputs = [ wrapQtAppsHook ];
+
+  # Make Qt packages available for QML import path
+  qtWrapperArgs = [
+    "--prefix QML2_IMPORT_PATH : ${qtbase}/${qtbase.qtQmlPrefix}"
+    "--prefix QML2_IMPORT_PATH : ${qtdeclarative.bin}/${qtbase.qtQmlPrefix}"
+    "--prefix QML2_IMPORT_PATH : ${qtquickcontrols}/${qtbase.qtQmlPrefix}"
+    "--prefix QML2_IMPORT_PATH : ${qtquickcontrols2.bin}/${qtbase.qtQmlPrefix}"
+    "--prefix QML2_IMPORT_PATH : ${qtgraphicaleffects}/${qtbase.qtQmlPrefix}"
+  ];
+
   postBuild =
     if (lib.versionAtLeast majorVersion "8") then
-      ''wrapProgram $out/bin/gz --set GZ_CONFIG_PATH "$out/share/gz"''
+      ''
+        wrapProgram $out/bin/gz \
+          --set GZ_CONFIG_PATH "$out/share/gz" \
+          --prefix QML2_IMPORT_PATH : "${qtbase}/${qtbase.qtQmlPrefix}" \
+          --prefix QML2_IMPORT_PATH : "${qtdeclarative.bin}/${qtbase.qtQmlPrefix}" \
+          --prefix QML2_IMPORT_PATH : "${qtquickcontrols}/${qtbase.qtQmlPrefix}" \
+          --prefix QML2_IMPORT_PATH : "${qtquickcontrols2.bin}/${qtbase.qtQmlPrefix}" \
+          --prefix QML2_IMPORT_PATH : "${qtgraphicaleffects}/${qtbase.qtQmlPrefix}"
+      ''
     else
-      ''wrapProgram $out/bin/ign --set IGN_CONFIG_PATH "$out/share/ignition"'';
+      ''
+        wrapProgram $out/bin/ign \
+          --set IGN_CONFIG_PATH "$out/share/ignition" \
+          --prefix QML2_IMPORT_PATH : "${qtbase}/${qtbase.qtQmlPrefix}" \
+          --prefix QML2_IMPORT_PATH : "${qtdeclarative.bin}/${qtbase.qtQmlPrefix}" \
+          --prefix QML2_IMPORT_PATH : "${qtquickcontrols}/${qtbase.qtQmlPrefix}" \
+          --prefix QML2_IMPORT_PATH : "${qtquickcontrols2.bin}/${qtbase.qtQmlPrefix}" \
+          --prefix QML2_IMPORT_PATH : "${qtgraphicaleffects}/${qtbase.qtQmlPrefix}"
+      '';
 }

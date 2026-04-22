@@ -6,8 +6,8 @@
 callPackage ./. (
   {
     majorVersion = "14";
-    version = "14.1.0";
-    srcHash = "sha256-45jD5lwNDJRJw8TKxCVBifKJYZ+NZcygSJozrynbs9g=";
+    version = "14.2.0";
+    srcHash = "sha256-jvEVa0BK7hnYWybNXh30KpNu00+OTtR9bdHCiN8Bpeg=";
   }
   // args
 )

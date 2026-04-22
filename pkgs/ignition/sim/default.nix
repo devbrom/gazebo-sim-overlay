@@ -30,6 +30,9 @@
   qtdeclarative,
   qtgraphicaleffects,
   qtquickcontrols,
+  # Darwin-specific
+  darwin ? null,
+  OpenGL ? null,
   ignition,
   ignition-cmake ? ignition.cmake,
   ignition-common ? ignition.common,
@@ -46,6 +49,7 @@
   ignition-utils ? ignition.utils,
   sdformat,
   wrapGAppsHook,
+  wrapQtAppsHook,
   bullet,
   eigen,
   python311Packages,
@@ -74,12 +78,11 @@ stdenv.mkDerivation rec {
     pkg-config
     ronn
     wrapGAppsHook
+    wrapQtAppsHook
   ];
 
   propagatedBuildInputs = [
     freeimage
-    freeglut
-    libGL
     openal
     hdf5
     curl
@@ -115,24 +118,25 @@ stdenv.mkDerivation rec {
     ignition-tools
     sdformat
   ]
+  ++ lib.optionals stdenv.isLinux [
+    freeglut
+    libGL
+  ]
+  ++ lib.optionals stdenv.isDarwin [
+    OpenGL
+  ]
   ++ lib.optional withBulletEngineSupport bullet;
-  patches =
-    lib.optional (majorVersion == "9") [
-      (fetchpatch {
-        url = "https://github.com/gazebosim/gz-sim/commit/5ee6a396cfb87c7b6588ad96083233032980e639.patch";
-        hash = "sha256-o9o5YJ4cnHibX+LF/SSRLG0R9QBTKdvkxLFykwBtQwc=";
-      })
-    ]
-    ++ lib.optional (majorVersion == "8") [
-      (fetchpatch {
-        url = "https://github.com/gazebosim/gz-sim/commit/5ee6a396cfb87c7b6588ad96083233032980e639.patch";
-        hash = "sha256-o9o5YJ4cnHibX+LF/SSRLG0R9QBTKdvkxLFykwBtQwc=";
-      })
-    ];
+
+  patches = lib.optional (majorVersion == "8") [
+    (fetchpatch {
+      url = "https://github.com/gazebosim/gz-sim/commit/5ee6a396cfb87c7b6588ad96083233032980e639.patch";
+      hash = "sha256-o9o5YJ4cnHibX+LF/SSRLG0R9QBTKdvkxLFykwBtQwc=";
+    })
+  ];
 
   buildInputs = [ cmake ];
 
-  dontWrapQtApps = true;
+  dontWrapQtApps = false;
   cmakeFlags = [
     "-DCMAKE_INSTALL_LIBDIR='lib'"
   ];

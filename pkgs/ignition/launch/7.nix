@@ -6,7 +6,7 @@
 callPackage ./. (
   {
     majorVersion = "7";
-    version = "7.1.0";
+    version = "7.1.1";
     srcHash = "sha256-En3V8i/Ie8+KnSHGlm9Bap7REdLhYBaVHVbOM+/Pzno=";
     ignition-cmake = ignition.cmake;
     ignition-utils = ignition.utils;

@@ -1,0 +1,19 @@
+diff --git a/OgreMain/include/OgreUTFString.h b/OgreMain/include/OgreUTFString.h
+index 089568c11..2542316e0 100644
+--- a/OgreMain/include/OgreUTFString.h
++++ b/OgreMain/include/OgreUTFString.h
+@@ -188,10 +188,12 @@ namespace Ogre {
+ 		static const size_type npos = static_cast<size_type>(~0);
+ 
+ 		//! a single 32-bit Unicode character
+-		typedef uint32 unicode_char;
++		// Use char32_t instead of uint32 for proper std::char_traits support in libc++
++		typedef char32_t unicode_char;
+ 
+ 		//! a single UTF-16 code point
+-		typedef uint16 code_point;
++		// Use char16_t instead of uint16 for proper std::char_traits support in libc++
++		typedef char16_t code_point;
+ 
+ 		//! value type typedef for use in iterators
+ 		typedef code_point value_type;
